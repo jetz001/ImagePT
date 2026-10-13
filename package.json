@@ -1,0 +1,30 @@
+{
+  "name": "imagept",
+  "version": "1.0.0",
+  "description": "AI Image Prompt Studio with Categorized Builder, Visual Previews, Hybrid Image-to-Prompt, RAG Vector, and MCP Server",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "mcp:server": "node src/mcp/server.js"
+  },
+  "keywords": [
+    "ai",
+    "prompt",
+    "prompt-generator",
+    "midjourney",
+    "stable-diffusion",
+    "flux",
+    "dalle",
+    "electron",
+    "mcp",
+    "rag"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "exifreader": "^4.26.0"
+  },
+  "devDependencies": {
+    "electron": "^34.2.0"
+  }
+}
