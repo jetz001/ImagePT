@@ -14,18 +14,18 @@
       <div class="brand-icon">✨</div>
       <div>
         <div class="brand-title">ImagePT Studio</div>
-        <div class="brand-subtitle">AI Image Prompt Generator</div>
+        <div class="brand-subtitle">AI Prompt Builder สำหรับมือใหม่ & มืออาชีพ</div>
       </div>
     </div>
 
     <!-- AI Smart Auto-fill Search Bar -->
     <div class="autofill-container">
       <div class="autofill-box">
-        <span style="font-size: 14px; margin-right: 6px;">💡</span>
-        <input type="text" id="autofillInput" class="autofill-input" placeholder="พิมพ์ไอเดียสั้นๆ (ไทย/อังกฤษ) เช่น สาวไทยในชุดไทยริมหาดยามเย็น..." />
-        <button id="btnAutofill" class="autofill-btn">
-          <span>AI Auto-fill</span>
-          <span style="font-size: 11px;">↵</span>
+        <span class="autofill-sparkle">🪄</span>
+        <input type="text" id="autofillInput" class="autofill-input" placeholder="พิมพ์ไอเดียสั้นๆ ให้ AI จัดแท็กให้ เช่น สาวไทยในคาเฟ่มินิมอลแสงยามเย็น..." />
+        <button id="btnAutofill" class="autofill-btn" title="ให้ระบบค้นหาและจัดหมวดหมู่แท็กให้อัตโนมัติ">
+          <span>AI จัดแท็กให้</span>
+          <span style="font-size: 11px; opacity: 0.85;">↵</span>
         </button>
       </div>
     </div>
@@ -35,12 +35,12 @@
       <!-- Image to Prompt Button -->
       <button id="btnOpenImagePrompt" class="btn-header primary" title="ลากวางรูปภาพ หรืออัปโหลดเพื่อแกะเป็น Prompt">
         <span>📷</span>
-        <span>Image to Prompt</span>
+        <span>แกะรูปเป็น Prompt</span>
       </button>
 
       <!-- 🔞 NSFW Mode Switch -->
       <label class="toggle-wrapper" id="nsfwToggleWrapper" title="เปิด/ปิดโหมด 18+ ปลดล็อกชุดว่ายน้ำ ชุดชั้นใน และสไตล์วาบหวิว">
-        <span>🔞 โหมด 18+</span>
+        <span>🔞 18+</span>
         <div class="switch">
           <input type="checkbox" id="nsfwToggle">
           <span class="slider nsfw-slider"></span>
@@ -59,12 +59,14 @@
       <!-- Favorites & History Button -->
       <button id="btnHistory" class="btn-header" title="ดูประวัติและรายการโปรด">
         <span>⭐️</span>
-        <span>รายการโปรด / ประวัติ</span>
+        <span>คลังที่บันทึก</span>
+        <span id="favCountBadge" class="header-badge" style="display: none;">0</span>
       </button>
 
       <!-- Settings Button -->
       <button id="btnSettings" class="btn-header" title="ตั้งค่า API Key (OpenAI, Gemini, OpenRouter, Ollama)">
         <span>⚙️</span>
+        <span>ตั้งค่า AI</span>
       </button>
     </div>
   </header>
@@ -73,26 +75,55 @@
   <div class="app-body">
     <!-- Sidebar Navigation -->
     <aside class="sidebar" id="sidebarNav">
-      <div class="sidebar-heading">หมวดหมู่รูปภาพ (Categories)</div>
+      <div class="sidebar-heading">1. เลือกหมวดหมู่ภาพ</div>
       <!-- Category nav items dynamically rendered by JS -->
     </aside>
 
     <!-- Main Content Area -->
     <main class="main-content">
-      <div class="content-scrollable" id="mainContentScroll">
-        <!-- Category Header -->
-        <div class="category-header">
-          <div class="category-title-row">
-            <h1 class="category-title" id="catTitle">
-              <span id="catIcon">👤</span>
-              <span id="catName">รูปคน (People & Portraits)</span>
-            </h1>
+      <!-- Sticky Top Sub-Header: Category Info + 5W1H Step Filter + Tag Search -->
+      <div class="workspace-toolbar">
+        <div class="category-header-compact">
+          <div class="category-title-group">
+            <span class="category-hero-icon" id="catIcon">👤</span>
+            <div>
+              <h1 class="category-title" id="catTitle">
+                <span id="catName">รูปคน (People & Portraits)</span>
+              </h1>
+              <p class="category-desc" id="catDesc">ระบบสร้างรูปบุคคลระดับมืออาชีพ เจาะลึกสรีระ สัญชาติ เสื้อผ้า ท่าทาง และแสง</p>
+            </div>
           </div>
-          <p class="category-desc" id="catDesc">ระบบสร้างรูปบุคคลระดับมืออาชีพ เจาะลึกสรีระ สัญชาติ เสื้อผ้า ท่าทาง และแสง</p>
+
+          <!-- Quick Tag Search Box -->
+          <div class="tag-search-box">
+            <span>🔍</span>
+            <input type="text" id="tagSearchInput" placeholder="ค้นหาแท็กในหมวดนี้ (เช่น สายเดี่ยว, คาเฟ่, 85mm)..." />
+            <button id="btnClearTagSearch" class="tag-search-clear" style="display: none;" title="ล้างคำค้นหา">✕</button>
+          </div>
+        </div>
+
+        <!-- 5W1H Step-by-Step Filter Bar (Rendered by JS when applicable) -->
+        <div class="framework-nav-bar" id="frameworkNavBar"></div>
+      </div>
+
+      <!-- Scrollable Builder Area -->
+      <div class="content-scrollable" id="mainContentScroll">
+        <!-- Quick Starter Templates Bar -->
+        <div class="templates-banner" id="templatesBanner">
+          <div class="templates-header">
+            <div class="templates-title">
+              <span>⚡</span>
+              <span>เทมเพลตเริ่มด่วนในคลิกเดียว (Quick Starter Presets)</span>
+              <span class="templates-hint">— คลิกเพื่อเลือกชุดแท็กยอดฮิต แล้วปรับแก้ต่อได้ตามใจชอบ</span>
+            </div>
+          </div>
+          <div class="templates-grid" id="templatesContainer">
+            <!-- Rendered by JS -->
+          </div>
         </div>
 
         <!-- Option Groups & Chips Container -->
-        <div id="optionGroupsContainer" style="display: flex; flex-direction: column; gap: 18px;">
+        <div id="optionGroupsContainer" class="option-groups-grid">
           <!-- Rendered by JS -->
         </div>
 
@@ -103,68 +134,104 @@
               <span>✍️</span>
               <span>รายละเอียดเพิ่มเติมเอง (Custom Prompt Details)</span>
             </div>
-            <span style="font-size: 11px; color: var(--text-muted);">ภาษาอังกฤษหรือข้อความเฉพาะที่ต้องการเพิ่ม</span>
+            <span class="group-hint-badge">พิมพ์ภาษาอังกฤษเพิ่มเติมต่อท้าย Prompt</span>
           </div>
-          <textarea id="customPromptInput" class="custom-textarea" placeholder="เช่น holding a glowing vintage lantern, standing in front of traditional Thai temple..."></textarea>
+          <textarea id="customPromptInput" class="custom-textarea" placeholder="เช่น holding a glowing vintage lantern, standing in front of traditional Thai temple, cinematic raindrops..."></textarea>
         </div>
       </div>
 
-      <!-- Bottom Dock: Aspect Ratios, Live Preview & Action Bar -->
-      <footer class="bottom-dock">
-        <!-- Aspect Ratio Selector Bar -->
-        <div class="aspect-bar">
-          <span class="aspect-label">สัดส่วนภาพ (Aspect):</span>
-          <div class="aspect-chips" id="aspectChipsContainer">
-            <!-- Rendered by JS -->
+      <!-- Bottom Dock: Active Selection Pills, Aspect Ratios, Live Preview & Action Bar -->
+      <footer class="bottom-dock" id="bottomDock">
+        <!-- Dock Top Bar: Active Selected Tags Tray + Platform Mode + Collapse Toggle -->
+        <div class="dock-top-bar">
+          <div class="selected-tray-wrapper">
+            <span class="tray-label" id="selectedCountLabel">แท็กที่เลือก (0):</span>
+            <div class="selected-pills-scroll" id="selectedPillsContainer">
+              <span class="tray-empty-hint">ยังไม่ได้เลือกแท็ก — คลิกเลือกแท็กด้านบน หรือกด "เทมเพลตเริ่มด่วน" เพื่อเริ่มต้น</span>
+            </div>
+          </div>
+
+          <div class="dock-right-controls">
+            <!-- AI Target Generator Format -->
+            <div class="platform-selector" title="เลือกรูปแบบคำสั่งให้เหมาะกับค่าย AI ที่คุณใช้">
+              <span class="platform-label">ฟอร์แมต:</span>
+              <button type="button" class="platform-btn active" data-platform="midjourney">Midjourney</button>
+              <button type="button" class="platform-btn" data-platform="flux">FLUX / DALL-E</button>
+              <button type="button" class="platform-btn" data-platform="sd">Stable Diffusion</button>
+            </div>
+
+            <!-- Aspect Ratio Selector Bar -->
+            <div class="aspect-bar">
+              <span class="aspect-label">สัดส่วน:</span>
+              <div class="aspect-chips" id="aspectChipsContainer">
+                <!-- Rendered by JS -->
+              </div>
+            </div>
+
+            <button type="button" id="btnToggleDock" class="btn-dock-collapse" title="ย่อ/ขยายแผงดูผลลัพธ์ด้านล่าง">
+              <span id="dockToggleIcon">▼</span>
+              <span id="dockToggleText">ย่อแถบ</span>
+            </button>
           </div>
         </div>
 
-        <!-- Live Preview Textboxes -->
-        <div class="preview-boxes">
-          <!-- Positive Prompt Preview -->
-          <div class="preview-box">
-            <div class="preview-box-header">
-              <span class="preview-badge positive">Positive Prompt (พร้อมใช้งาน)</span>
-              <span id="promptCharCount" style="font-size: 10px; color: var(--text-muted);">0 คำ</span>
+        <!-- Collapsible Body of Bottom Dock -->
+        <div class="dock-body" id="dockBody">
+          <!-- Live Preview Textboxes -->
+          <div class="preview-boxes">
+            <!-- Positive Prompt Preview -->
+            <div class="preview-box positive-box">
+              <div class="preview-box-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="preview-badge positive">✨ Positive Prompt (พร้อมคัดลอกไปใช้)</span>
+                  <span id="promptCharCount" class="char-count-label">0 คำ</span>
+                </div>
+                <button id="btnCopyPosInline" class="btn-inline-copy pos">📋 คัดลอกทันที</button>
+              </div>
+              <div class="preview-text" id="livePositivePreview">กำลังประมวลผล...</div>
             </div>
-            <div class="preview-text" id="livePositivePreview">กำลังประมวลผล...</div>
-          </div>
 
-          <!-- Negative Prompt Preview (Collapsible) -->
-          <div class="preview-box" id="negPreviewBox">
-            <div class="preview-box-header">
-              <span class="preview-badge negative">Negative Prompt (คำสั่งคัดออก)</span>
-              <button id="btnCopyNegInline" style="background: none; border: none; color: #fb7185; font-size: 11px; cursor: pointer; font-weight: 600;">📋 คัดลอก</button>
+            <!-- Negative Prompt Preview (Collapsible) -->
+            <div class="preview-box negative-box" id="negPreviewBox">
+              <div class="preview-box-header">
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                  <span class="preview-badge negative">🚫 Negative Prompt (สิ่งที่ไม่ต้องการให้เกิด)</span>
+                  <div class="neg-presets-bar" id="negPresetsBar">
+                    <!-- Rendered by JS -->
+                  </div>
+                </div>
+                <button id="btnCopyNegInline" class="btn-inline-copy neg">📋 คัดลอก</button>
+              </div>
+              <div class="preview-text" id="liveNegativePreview">bad anatomy, deformed, mutated, blurry, watermark</div>
             </div>
-            <div class="preview-text" id="liveNegativePreview">bad anatomy, deformed, mutated, blurry, watermark</div>
           </div>
         </div>
 
-        <!-- Bottom Action Buttons -->
+        <!-- Bottom Action Buttons (Always visible) -->
         <div class="action-bar">
           <div class="actions-left">
             <button id="btnCopyPrompt" class="btn-action copy-main">
               <span>📋</span>
               <span>คัดลอก Prompt (Copy)</span>
             </button>
-            <button id="btnCopyNegative" class="btn-action copy-neg" id="btnCopyNegBottom">
+            <button id="btnCopyNegative" class="btn-action copy-neg">
               <span>🚫</span>
               <span>คัดลอก Negative</span>
             </button>
-            <button id="btnFavorite" class="btn-action secondary" title="บันทึกเก็บเป็นรายการโปรด">
+            <button id="btnFavorite" class="btn-action secondary" title="บันทึกเก็บเข้าคลังรายการโปรด">
               <span>★</span>
-              <span>บันทึกรายการโปรด</span>
+              <span>เก็บไว้ในคลัง</span>
             </button>
           </div>
 
           <div class="actions-right">
-            <button id="btnRandomize" class="btn-action secondary" title="สุ่มแท็กในหมวดหมู่นี้เพื่อหาไอเดียใหม่ๆ">
+            <button id="btnRandomize" class="btn-action random-btn" title="สุ่มแท็กในหมวดหมู่นี้เพื่อหาไอเดียใหม่ๆ">
               <span>🎲</span>
               <span>สุ่มไอเดีย (Randomize)</span>
             </button>
-            <button id="btnClear" class="btn-action secondary" title="ล้างตัวเลือกทั้งหมดเพื่อเริ่มใหม่">
+            <button id="btnClear" class="btn-action secondary" title="ล้างตัวเลือกทั้งหมดในหมวดนี้เพื่อเริ่มใหม่">
               <span>🔄</span>
-              <span>ล้างค่า (Reset)</span>
+              <span>เริ่มใหม่ (Reset)</span>
             </button>
           </div>
         </div>
@@ -184,12 +251,12 @@
       </div>
       <div class="modal-content">
         <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
-          ใส่ API Key เพื่อใช้งานฟีเจอร์ <strong>AI Smart Auto-fill</strong> และ <strong>Vision AI Image-to-Prompt</strong> (หากไม่ใส่ ยังคงใช้งานฟังก์ชันสร้าง Prompt ทั่วไปได้ 100% ฟรี)
+          ใส่ API Key เพื่อใช้งานฟีเจอร์ <strong>AI จัดแท็กอัตโนมัติ</strong> และ <strong>Vision AI แกะรูปภาพ</strong> (หากไม่ใส่ ยังคงใช้งานฟังก์ชันสร้าง Prompt และคลังตัวอย่างออฟไลน์ได้ 100% ฟรี)
         </p>
 
         <div>
-          <label style="font-size: 12px; font-weight: 600; color: #e2e8f0; display: block; margin-bottom: 6px;">ผู้ให้บริการ AI (Provider):</label>
-          <select id="settingProvider" style="width: 100%; padding: 8px 12px; background: var(--bg-primary); border: 1px solid var(--border-subtle); color: #fff; border-radius: var(--radius-sm); outline: none;">
+          <label class="modal-label">ผู้ให้บริการ AI (Provider):</label>
+          <select id="settingProvider" class="modal-input">
             <option value="gemini">Google Gemini (แนะนำ รวดเร็วและฟรีโควตา)</option>
             <option value="openai">OpenAI (GPT-4o / GPT-4o-mini)</option>
             <option value="openrouter">OpenRouter (เข้าถึงได้ทุกโมเดล)</option>
@@ -198,18 +265,18 @@
         </div>
 
         <div>
-          <label style="font-size: 12px; font-weight: 600; color: #e2e8f0; display: block; margin-bottom: 6px;">API Key:</label>
-          <input type="password" id="settingApiKey" placeholder="AIzaSy... หรือ sk-..." style="width: 100%; padding: 8px 12px; background: var(--bg-primary); border: 1px solid var(--border-subtle); color: #fff; border-radius: var(--radius-sm); outline: none;" />
+          <label class="modal-label">API Key:</label>
+          <input type="password" id="settingApiKey" class="modal-input" placeholder="AIzaSy... หรือ sk-..." />
         </div>
 
         <div>
-          <label style="font-size: 12px; font-weight: 600; color: #e2e8f0; display: block; margin-bottom: 6px;">Model Name (เว้นว่างไว้เพื่อใช้ค่ามาตรฐาน):</label>
-          <input type="text" id="settingModel" placeholder="gemini-1.5-flash, gpt-4o-mini, llama-3.3-70b..." style="width: 100%; padding: 8px 12px; background: var(--bg-primary); border: 1px solid var(--border-subtle); color: #fff; border-radius: var(--radius-sm); outline: none;" />
+          <label class="modal-label">Model Name (เว้นว่างไว้เพื่อใช้ค่ามาตรฐาน):</label>
+          <input type="text" id="settingModel" class="modal-input" placeholder="gemini-1.5-flash, gpt-4o-mini, llama-3.3-70b..." />
         </div>
 
         <div>
-          <label style="font-size: 12px; font-weight: 600; color: #e2e8f0; display: block; margin-bottom: 6px;">Custom Base URL (เฉพาะกรณีใช้ Ollama หรือ Proxy):</label>
-          <input type="text" id="settingBaseUrl" placeholder="http://localhost:11434" style="width: 100%; padding: 8px 12px; background: var(--bg-primary); border: 1px solid var(--border-subtle); color: #fff; border-radius: var(--radius-sm); outline: none;" />
+          <label class="modal-label">Custom Base URL (เฉพาะกรณีใช้ Ollama หรือ Proxy):</label>
+          <input type="text" id="settingBaseUrl" class="modal-input" placeholder="http://localhost:11434" />
         </div>
       </div>
       <div class="modal-footer">
@@ -230,18 +297,18 @@
       </div>
       <div class="modal-content">
         <div style="display: flex; gap: 16px; align-items: flex-start;">
-          <div style="width: 180px; height: 180px; background: var(--bg-primary); border: 2px dashed var(--border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;" id="imagePreviewContainer">
-            <span id="imagePlaceholder" style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 10px;">ลากไฟล์มาวาง หรือคลิกเลือกรูป</span>
+          <div class="image-dropzone-preview" id="imagePreviewContainer">
+            <span id="imagePlaceholder" style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 10px;">📥 ลากไฟล์มาวาง<br>หรือคลิกเลือกรูป</span>
             <img id="imagePreviewImg" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
           </div>
 
           <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
             <input type="file" id="filePickerInput" accept="image/png,image/jpeg,image/webp" style="display: none;" />
-            <button id="btnChooseImage" class="btn-header" style="justify-content: center;">
+            <button id="btnChooseImage" class="btn-header" style="justify-content: center; padding: 10px;">
               <span>📁</span>
-              <span>เลือกไฟล์รูปภาพจากเครื่อง</span>
+              <span>เลือกไฟล์รูปภาพจากเครื่อง (PNG, JPG, WEBP)</span>
             </button>
-            <div id="imageMetadataStatus" style="font-size: 11px; padding: 8px 12px; background: var(--bg-primary); border-radius: 6px; border: 1px solid var(--border-subtle); color: var(--text-secondary); line-height: 1.4;">
+            <div id="imageMetadataStatus" class="metadata-status-box">
               ยังไม่มีไฟล์ที่เลือก (รองรับทั้งรูปที่มี Metadata ของ SD/ComfyUI และรูปถ่ายทั่วไป)
             </div>
             <button id="btnAnalyzeVisionAI" class="btn-action copy-main" style="display: none; justify-content: center; font-size: 12px;">
@@ -270,15 +337,15 @@
 
   <!-- Favorites & History Drawer Modal -->
   <div class="modal-overlay" id="historyModal">
-    <div class="modal-box" style="max-width: 640px;">
+    <div class="modal-box" style="max-width: 660px;">
       <div class="modal-header">
         <div class="modal-title">
           <span>⭐️</span>
-          <span>รายการโปรด & ประวัติล่าสุด</span>
+          <span>คลังรายการโปรด & ประวัติการคัดลอก</span>
         </div>
         <button class="modal-close" id="btnCloseHistory">✕</button>
       </div>
-      <div class="modal-content" style="padding: 12px 20px;">
+      <div class="modal-content" style="padding: 14px 20px;">
         <div style="display: flex; gap: 8px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 10px;">
           <button id="tabFavorites" class="btn-header primary" style="flex: 1; justify-content: center;">★ รายการโปรด (Favorites)</button>
           <button id="tabHistory" class="btn-header" style="flex: 1; justify-content: center;">🕒 ประวัติล่าสุด (History)</button>
